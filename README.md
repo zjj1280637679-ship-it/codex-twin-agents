@@ -1,114 +1,112 @@
-# codex-twin-agents
+# Codex Twin Agents
 
-> Codex 插件（**设计阶段，尚未实现**）：为**开放性任务**派发**同文异步孪生子代理**。
+> **同文异步开放性任务孪生**（Same-Context Asynchronous Open-Ended Task Twin）的 Codex 插件原型。
 
-给定一个没有唯一正确答案的开放任务，这个插件把父代理**当前完整上下文**复制成 N 份，
-派发 N 个**孪生子代理**并发探索；父代理**不阻塞**，继续做自己的事；结果落地后回收、对比、汇总。
+它不是“把一份 briefing 交给另一个子代理”的普通分工，而是让 Codex 在复杂工作的自然检查点，把**当前完整认知上下文分叉给一个异步孪生体**：主线程继续工作；孪生体在同一现实模型上做开放式收尾、复盘、验证、前提审查、知识库整理和遗漏修复。
 
----
+## 核心原则
 
-## 名词
+- **同文**：优先继承完整上下文，而不是先摘要再交接。
+- **异步**：主线程不因后台复盘而停住。
+- **开放性**：孪生体主动发现“还有什么没做完、没验证、可能错了或值得整理”，而不是只执行一条封闭 checklist。
+- **分身而非分工**：普通子代理复制任务；孪生代理复制认知现场。
+- **低风险自修，高影响上报**：已经授权、可逆、低风险的收尾可以自行完成；会改变主决策、产生新的外部副作用或需要额外授权的事项，应附证据写信给主线程。
+- **不为省一点上下文牺牲现实理解**：复杂任务优先保真，成本优化交给缓存和运行时。
 
-| 词 | 含义 |
-|---|---|
-| **同文** | 每个孪生从父代理**同一份上下文**出发，而不是从零开始的干净子代理。孪生之间初始条件完全相同，差异只来自探索路径。 |
-| **孪生** | 同一任务、同一上下文、同一工具集的 N 个独立实例。 |
-| **异步** | 派发即返回，父代理继续工作；结果写回后再回收，不占用父代理的回合。 |
-| **开放性任务** | 没有唯一正确答案、无法用单个断言判定的任务：技术调研、方案枚举、对抗性审查、大范围重构预研、根因搜索。 |
+## 为什么现在可以做
 
-## 为什么是"同文"，而不是普通子代理
+OpenAI 当前的原生 multi-agent 已经提供了关键底座：根代理可以创建子代理，并决定传播多少父上下文；Responses multi-agent 文档明确暴露 `fork_turns`。Codex/Agent Plugins 也已经有正式的 Plugin + Skill 打包规范。
 
-普通子代理是**干净上下文**：它只拿到你写进 prompt 的那点信息。
-对**封闭任务**（"把这个函数改成 X"）这没问题，因为任务本身已经携带了全部约束。
+这意味着第一版不需要发明一个新的代理框架，只需要把“**什么时候值得 fork、孪生体该以什么目标运行、结果如何回到主线程**”固化成可复用 Skill。
 
-对**开放任务**恰恰相反：答案高度依赖那些**没被写进 prompt 的隐知识**——
-你刚才为什么否掉方案 B、代码里那条看似无关的约束、你们约定的口径。
-干净子代理拿不到这些，于是给出一个"理论上正确、对你们不适用"的答案。
+## 当前实现路线：Skill-first
 
-同文孪生解决的就是这一点：**把上下文本身当作任务输入的一部分**。
+v0.1 **故意不伪造一个自动 hook fork**。
 
-## 为什么是"孪生"，而不是一个更强的子代理
+Codex hooks 当前支持后台 command hook，但后台 hook 完成后不会主动开启新 turn；而 hook 的 `agent` handler 目前仍是“可解析但跳过执行”。因此，第一阶段采用最小而规范的实现：
 
-单点更强的子代理仍然是**一个**样本：它一旦选错方向，你没有第二条路。
-N 个孪生初始条件完全相同，所以**结果的差异可以归因到探索路径本身**——
-这既是多样性采样，也是一种廉价的对抗性验证：
+1. 主代理在自然检查点识别出“这个任务值得保留完整现实理解再做一次开放审查”。
+2. 调用原生 multi-agent 创建孪生体。
+3. 在宿主支持时传播完整/最大可用上下文（Responses multi-agent 中对应 `fork_turns: "all"`）。
+4. 主线程继续，不默认等待。
+5. 孪生体独立执行收尾、验证、复盘、知识整理和前提审查。
+6. 低风险已授权事项可直接补完；高影响发现通过 agent message / final report 回到父代理。
 
-- 多个孪生**收敛**到同一结论 → 该结论对探索路径不敏感，可信度上升。
-- 多个孪生**分叉** → 分叉点本身就是最有价值的信息，它标记出任务里真正模糊的地方。
+等 Codex runtime 提供“hook 原生启动同文 subagent”的稳定能力后，再把触发从 Skill 驱动升级为真正后台自动化。
 
-## 为什么必须异步
+## 目录
 
-开放任务的耗时方差极大（一个孪生 30 秒，另一个 8 分钟）。
-同步等待会让父代理被最慢的那个拖住，也浪费了 Codex 本来能并行做的事。
-异步派发 + 结果落地后回收，让"等待"变成"后台进行"。
-
----
-
-## 与 Codex 原生能力的关系
-
-Codex 已经提供了大部分**底座**（以下机制在 `openai/codex` 仓库中实证存在）：
-
-| 能力 | 位置 | 状态 |
-|---|---|---|
-| 自定义代理 | `.codex/agents/`（项目级）、`~/.codex/agents/`（个人级），单文件 TOML | 原生 |
-| 技能（Agent Skills） | `SKILL.md` + 可选 `scripts/` `references/` `assets/`；项目级 `.agents/skills/`，用户级 `~/.agents/skills/` | 原生 |
-| 自定义提示词 | `~/.codex/prompts/*.md`，以 `/prompts:<name>` 调用 | 原生 |
-| MCP | `config.toml` 里的 `[mcp_servers.<name>]` | 原生 |
-| 子代理 | 默认开启，但**只有显式要求时才会派生** | 原生 |
-| 插件系统 | `codex-rs/plugin`（manifest / provider / bundled_hooks）、`codex-rs/core-plugins`（manifest / marketplace / executor_hooks / `agent_plugin_manifest`） | 原生 |
-
-**本插件要补的缺口**，不是上面任何一条，而是把它们组合成一件可复用的事：
-
-> 把「同文 + 异步 + N 孪生 + 回收汇总」从一段每次都要手写的提示词，
-> 变成一条命令 / 一个技能。
-
-## 设计草案（未实现）
-
-```
+```text
 codex-twin-agents/
-├── SKILL.md                  # 技能入口：什么时候该派孪生、派几个、怎么回收
-├── agents/
-│   └── twin.toml             # 孪生代理定义（name / description / developer_instructions）
-├── scripts/
-│   ├── spawn.py              # 派发 N 个同文孪生（异步）
-│   ├── collect.py            # 回收 + 归一化结果
-│   └── adjudicate.py         # 收敛/分叉判定，输出对比矩阵
-├── references/
-│   ├── design.md             # 设计说明与取舍
-│   └── failure-modes.md      # 已知失败模式
-└── plugin.toml               # 插件 manifest（schema 待核实）
+├── plugin.json                         # 推荐的 Agent Plugins 可移植清单
+├── .codex-plugin/
+│   └── plugin.json                     # Codex 兼容清单
+├── skills/
+│   └── open-task-twin/
+│       └── SKILL.md                    # 核心孪生工作流
+├── docs/
+│   ├── architecture.md                 # 架构与边界
+│   ├── platform-notes.md               # 当前官方能力与实现取舍
+│   └── runtime-contract.md             # 孪生体与主线程通信约定
+├── evals/
+│   └── cases.md                        # 最小验收场景
+├── AGENTS.md                           # 维护本仓库时给 Codex 的约束
+├── LICENSE
+└── .gitignore
 ```
 
-预期用法（示意，非实际命令）：
+## 最小工作流
 
+```text
+主线程当前认知状态 C(t)
+        │
+        ├────────────────→ 主线程继续工作
+        │
+        └─ fork same context
+                ↓
+          异步开放孪生
+                ↓
+   收尾 / 复盘 / 验证 / 查前提 / 整理知识库
+                ↓
+       ┌────────┴────────┐
+       ↓                 ↓
+低风险已授权事项       高影响发现
+直接完成               写信给主线程
 ```
-/twins 调研"把构建系统从 A 迁到 B 的全部风险" --count 4 --async
-```
 
-## 已知失败模式（设计时就要防的）
+## 典型场景
 
-1. **上下文爆炸**：同文意味着 N 份上下文副本。N 与上下文长度必须联合设上限，否则 token 成本是乘法而不是加法。
-2. **伪多样性**：如果 N 个孪生用同一个模型、同一温度、同一提示词，它们可能给出 N 份几乎一样的答案——那是浪费，不是采样。
-3. **汇总裁决缺位**：只回收不裁决，等于把 N 份答案丢给人类。分叉检测与收敛判定是插件的核心价值，不是附属功能。
-4. **异步的孤儿**：父代理结束而孪生仍在跑时，结果必须有确定的落点（文件/任务板），否则静默丢失。
-5. **写冲突**：N 个孪生若同时改同一个仓库，会互相踩。第一版应限定为**只读探索**，写入类任务另行设计。
+- 主线程功能已经做完，但忘了同步 GitHub、README、issue、版本说明或项目状态。
+- 测试全绿，但孪生体发现测试并没有真正覆盖用户原始验收目标。
+- 主线程一直依赖某个未验证前提；孪生体异步回查代码、日志或文档后发现前提不成立。
+- 工作结束后，孪生体整理知识库、建立复盘记录、补证据链接，但不把“记忆杂务”塞回主线程。
+- 一个复杂 Debug 结束后，保留“错误假设 → 证据 → 假设降权 → 真根因”的认知轨迹，而不仅是最终摘要。
+- 主线程已经转入下一件事，孪生体继续检查是否存在漏提交流程、脏工作树、文档漂移或未闭环承诺。
+
+## 普通子代理 vs 同文孪生
+
+| | 普通子代理 | 同文孪生 |
+|---|---|---|
+| 初始输入 | briefing / 有限上下文 | 父代理完整或最大可用上下文 |
+| 目标 | 明确分工 | 开放观察与第二条认知分支 |
+| 交接损耗 | 较高 | 尽量低 |
+| 适合 | 搜索、跑测试、独立模块 | 复杂复盘、验收、根因审查、收尾 |
+| 默认是否等待 | 视任务而定 | 不等待，异步运行 |
+
+## 官方规范依据
+
+- Agent Plugins packaging: https://developers.openai.com/plugins/build/plugins
+- Skills: https://developers.openai.com/plugins/build/skills
+- Plugin architecture: https://developers.openai.com/plugins/concepts/plugins
+- Responses multi-agent: https://developers.openai.com/api/docs/guides/responses-multi-agent
+- Agents API multi-agent: https://developers.openai.com/api/docs/guides/agents-api/multi-agent
+- Codex hooks: https://learn.chatgpt.com/docs/hooks
 
 ## 状态
 
-**设计阶段。本仓库目前只描述设计，不含实现。**
+**v0.1.0 — architecture-first, skill-first prototype**
 
-之所以先落仓库而不是先写代码：同文异步孪生这件事的价值和风险都在**编排层**，
-不在代码量上。先把边界、失败模式、与原生能力的分工写清楚，实现才有意义。
+第一阶段只验证一个核心命题：
 
-## 待核实
+> 在复杂 Codex 工作中，“完整上下文分身 + 异步开放复盘”是否比 briefing 式普通子代理更少遗漏、更能发现前提错误，并在共享前缀/缓存命中的条件下保持可接受成本。
 
-- Codex 原生插件 manifest 的确切 schema（`codex-rs/plugin/src/manifest.rs`、
-  `codex-rs/core-plugins/src/manifest.rs` 未逐行读取）。
-- 插件经 marketplace 分发的路径与签名要求（`marketplace*.rs` 未读）。
-- 自定义代理 TOML 字段（`name` / `description` / `developer_instructions` 等）
-  来自 `developers.openai.com` 文档的第三方转述，实施前需对照官方原文复核。
-- Codex 原生是否已提供"派发子代理"的工具调用面，以及它是否支持同文继承。
-
-## License
-
-MIT
