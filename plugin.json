@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codex-twin-agents",
+  "version": "0.1.0",
+  "description": "Fork same-context Codex twins for asynchronous open-ended review, cleanup, verification, and follow-up.",
+  "author": {
+    "name": "zjj1280637679-ship-it"
+  },
+  "repository": "https://github.com/zjj1280637679-ship-it/codex-twin-agents"
+}
