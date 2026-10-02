@@ -1,0 +1,32 @@
+{
+  "name": "codex-twin-agents",
+  "version": "0.1.0",
+  "description": "Fork same-context Codex twins for asynchronous open-ended review, cleanup, verification, and follow-up.",
+  "author": {
+    "name": "zjj1280637679-ship-it"
+  },
+  "repository": "https://github.com/zjj1280637679-ship-it/codex-twin-agents",
+  "keywords": [
+    "codex",
+    "subagents",
+    "multi-agent",
+    "context-fork",
+    "review",
+    "verification"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Twin Agents",
+    "shortDescription": "Full-context async twins",
+    "longDescription": "Create same-context Codex twins that continue from the parent's full or maximum available context and asynchronously inspect unfinished, unverified, inconsistent, or improvable work. Twins can complete already-authorized low-risk cleanup and report higher-impact findings back to the parent with evidence.",
+    "developerName": "zjj1280637679-ship-it",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Same-context cognitive forking",
+      "Asynchronous open-ended review",
+      "Missed-step and cleanup recovery",
+      "Premise and acceptance verification",
+      "Knowledge-base and project hygiene"
+    ]
+  }
+}
