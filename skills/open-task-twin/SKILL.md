@@ -1,73 +1,180 @@
 ---
 name: open-task-twin
-description: Use when substantial Codex work would benefit from a same-context asynchronous twin that independently checks unfinished, unverified, inconsistent, or improvable work without interrupting the main thread. Prefer this over briefing-based delegation when the task depends heavily on the parent's accumulated context.
+description: Fork a same-context Codex twin when a complex task benefits from a second branch that preserves the parent's full accumulated context while independently continuing, verifying, consolidating, or re-deriving strategy and success metrics. Prefer this over briefing-based delegation when implicit history matters.
 ---
 
 # Open Task Twin
 
-Treat the twin as a cognitive fork, not as a specialist receiving a handoff.
+Use this skill to create a cognitive fork, not merely another worker.
 
-## When to fork
+The host-native Codex primitive performs the real context copy. This skill supplies the policy, Fork Handle, and workflow around it.
 
-Fork a twin at a natural checkpoint when at least one is true:
+## Core idea
 
-- a complex implementation or debugging task has reached an apparent completion point;
-- the work depends on many implicit constraints accumulated through the conversation;
-- a second full-context pass could catch missed cleanup, documentation, repository, or delivery steps;
-- a premise, acceptance criterion, or root-cause claim deserves independent verification;
-- the project knowledge base or memory should be consolidated without interrupting the main task;
-- an alternative cognitive path may reveal an issue that a narrow delegated subtask would miss.
+For an open twin, preserve G = root goal and C = shared conditions/evidence, while deliberately releasing S = local strategy and M = local success metric:
 
-Do not fork for tiny, easily described tasks where a normal bounded subagent is cheaper and equally faithful.
+    (G, C, S, M) -> (G, C, S', M')
 
-## How to fork
+The twin remembers the same past but is not obliged to continue the same local plan.
 
-1. Use the host's native multi-agent/subagent mechanism.
-2. Propagate the full or maximum available parent context. If the host exposes a context propagation parameter, request all parent turns; in Responses multi-agent this is `fork_turns: "all"`.
-3. Give the twin a short open-ended mission rather than a long re-description of the parent context. The twin already inherits the context.
-4. Do not wait by default. Continue the main task while the twin works.
-5. Avoid spawning multiple twins that would write concurrently to the same mutable files unless the work is explicitly coordinated.
+Read references/theory.md for the compact theory and ../../../docs/epistemology.md for the full project treatment.
 
-A suitable initial mission is:
+## Native runtime contract
 
-> You are an asynchronous same-context twin. You already share the parent's history. Independently inspect the current work for unfinished commitments, missing verification, false premises, documentation or repository drift, knowledge-base cleanup, regressions, and other worthwhile follow-up the parent may have missed. Complete only already-authorized low-risk reversible work. For higher-impact findings, send the parent a concise evidence-backed message instead of silently changing the main decision.
+Current Codex MultiAgentV2 exposes spawn_agent with task_name, message, and fork_turns. Use:
 
-## Twin priorities
+    fork_turns = "all"
 
-The twin should inspect the whole situation, not mechanically run a fixed checklist. Common high-value directions include:
+for a true same-context twin unless there is an explicit reason to propagate only bounded recent history.
 
-- closure: promised but unfinished work, dirty worktree, unsynced docs or repository state;
-- verification: whether tests and evidence actually prove the user's original acceptance goal;
-- premise audit: assumptions that were used but never established;
-- regression and side effects: nearby behavior that may have been broken;
-- knowledge hygiene: stale docs, conflicting project notes, missing rationale, useful evidence pointers;
-- retrospective: failed hypotheses, turning points, reusable lessons, and unresolved uncertainty;
-- delivery quality: whether the artifact, commit, issue, release note, or handoff is actually complete.
+Do not emulate a same-context twin by writing a compressed briefing when native full-history forking is available.
 
-## Action policy
+If the host does not expose native subagents or full-history propagation, say so. Do not silently call a clean-context child a twin.
 
-The twin may directly complete work only when all of these hold:
+## Fast path
 
-- the action is already within the user's authorization for the parent task;
-- it is low-risk and reasonably reversible;
-- it does not silently change a major design decision;
-- it does not create a new external commitment that the user did not authorize.
+### 1. Decide whether a twin is justified
 
-Otherwise, report the finding to the parent with evidence and a recommended next action.
+Use a twin when the task depends strongly on accumulated context, for example:
 
-## Reporting
+- a long implementation or debugging thread;
+- a task with many implicit user constraints;
+- a conclusion that deserves a second full-context pass;
+- apparent completion that may hide unfinished commitments;
+- retrospective or knowledge consolidation that should not block the main thread.
 
-Use native inter-agent messaging for urgent findings while the parent is still active. A final report should be short and evidence-first.
+Use a normal bounded delegate for small, easily described work.
 
-Prefer this shape:
+Use a fresh-context observer when the main question is whether the shared world model itself is wrong.
 
-```text
-severity: info | warning | critical
-kind: cleanup | verification | premise | regression | knowledge | follow-up
-finding: <what was discovered>
-evidence: <files/tests/logs/commits/docs>
-action_taken: <what the twin safely completed, if anything>
-recommended_next: <what the parent should do next, if anything>
-```
+### 2. Build a fork request
 
-If nothing material is found, say so briefly. Do not manufacture work just to justify the twin.
+Optional deterministic helper:
+
+    python skills/open-task-twin/scripts/twin_fork.py open \
+      --task-name open-twin \
+      --spawn-args-only
+
+The helper emits the exact argument shape to pass to native spawn_agent.
+
+Available modes:
+
+    open         preserve G/C, release local S/M, find worthwhile complementary work
+    directed     preserve full context, perform one explicitly targeted task
+    verify       independently test a claim or completion criterion
+    consolidate  organize memory/knowledge without derailing the main task
+
+For directed mode:
+
+    python skills/open-task-twin/scripts/twin_fork.py directed \
+      --task-name migration-check \
+      --objective "Validate the real migration path in production"
+
+The helper does not copy context by itself. Only Codex can access and fork the live parent conversation. It prepares the Fork Handle and native request.
+
+### 3. Spawn with full history
+
+Execute the emitted arguments with native spawn_agent. The critical field is fork_turns="all".
+
+The child's inherited history should be treated as its own past, not as a briefing supplied by somebody else.
+
+### 4. Keep the parent moving
+
+Do not wait by default.
+
+After spawning:
+
+- the main branch continues the current work;
+- the twin runs asynchronously;
+- do not duplicate the twin's job just because it is still running;
+- synchronize only when the twin reports something material or a natural checkpoint is reached.
+
+This separation is intentional: the main branch retains execution pressure; the twin is released from part of that pressure.
+
+### 5. Communicate consequential findings
+
+Use native inter-agent messaging when a finding materially changes what the main branch should do.
+
+A useful message shape is:
+
+    severity: info | warning | critical
+    kind: cleanup | verification | premise | regression | knowledge | follow-up
+    finding: <what changed our understanding>
+    evidence: <files/tests/logs/commits/docs>
+    action_taken: <safe action already completed, if any>
+    recommended_next: <what the main branch should reconsider>
+
+The twin should not send progress chatter merely to prove it is alive.
+
+## Open-twin semantics
+
+An open twin should act as follows:
+
+> The inherited parent history is your own past. Preserve the user's root intent, evidence, constraints, and the shared working model of reality as the starting point. Do not treat the parent's current local strategy, current KPI, or "almost finished" pressure as obligations. Re-derive what is worth doing from the root goal and the evidence. Look especially for useful work the main branch may not say aloud or may leave unfinished.
+
+This means the twin can:
+
+- finish already-authorized low-risk cleanup;
+- detect missing GitHub/repository/documentation closure;
+- challenge whether tests prove the original goal;
+- surface an unsupported premise;
+- find regressions and side effects;
+- consolidate knowledge or memory;
+- propose a better metric when the current one has become a proxy rather than the goal.
+
+Do not manufacture disagreement. Full context is valuable because it preserves reality; the point is to release action inertia, not to erase evidence.
+
+## Context blindness and reality calibration
+
+Same-context inheritance has a known limitation: the twin can inherit the same conditions model C and therefore the same blind spot.
+
+An open twin mainly provides:
+
+    C stays mostly continuous
+    S/M may reboot
+
+If the important question is instead "Are our conditions, categories, causal story, or evidence selection wrong?", use a fresh-context or independently reconstructed reality calibrator. That is a different cognitive freedom axis.
+
+Do not confuse changing strategy with changing the model of reality.
+
+## Action boundary
+
+A twin may act directly when the action is:
+
+- already authorized by the user's parent task;
+- low-risk;
+- reversible;
+- not a silent change to a major design decision;
+- not a new external commitment.
+
+Report first when the action would:
+
+- change core architecture;
+- revert substantial work;
+- deploy/publish/contact externally without clear authorization;
+- perform destructive operations;
+- change security or permission boundaries;
+- materially reinterpret the user's goal.
+
+## Concurrency and workspace writes
+
+Read-only twins can usually run in parallel within host limits.
+
+For mutable repository work, prefer one writer, or isolated branches/worktrees followed by an explicit merge.
+
+A same-context twin is a cognitive branch, not permission to create uncontrolled write races.
+
+## Success condition
+
+The skill succeeds when the fork produces materially better cognitive coverage than a short briefing would have produced.
+
+Do not judge success merely by whether a subagent was spawned.
+
+High-value evidence includes:
+
+- a missed commitment completed;
+- a false premise found;
+- an acceptance metric corrected;
+- a regression discovered;
+- reusable project knowledge consolidated;
+- a clean result that credibly confirms no material issue remains.
