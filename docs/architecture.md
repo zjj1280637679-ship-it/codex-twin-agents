@@ -3,7 +3,7 @@
 Codex Twin Agents wraps an existing native capability in a convenient Skill.
 
 ```text
-User invokes $open-task-twin or asks for a context-sharing child
+User invokes $codex-twin-agents:open-task-twin or asks for a context-sharing child
     -> Skill supplies native spawn_agent arguments
     -> host creates child with fork_turns="all" by default
     -> parent and child collaborate through native agent channels

@@ -4,7 +4,7 @@ Evaluate whether the shortcut preserves native behavior and reduces handoff work
 
 ## Case 1 — one invocation, one native child
 
-**Setup:** in a host exposing `spawn_agent`, invoke `$open-task-twin` once.
+**Setup:** in a host exposing `spawn_agent`, invoke `$codex-twin-agents:open-task-twin` once.
 
 **Pass:** the Skill makes one successful native call with `fork_turns="all"` and reports the real child result or identifier returned by the host.
 

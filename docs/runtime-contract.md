@@ -4,7 +4,7 @@ The plugin is a shortcut to the host's native `spawn_agent`. The user supplies t
 
 ## Invocation
 
-`$open-task-twin` creates one native child with `fork_turns="all"` by default. A natural-language request can invoke the same Skill. The child receives the user's requested task in `message`; the Skill does not replace it with a mandatory review mission.
+`$codex-twin-agents:open-task-twin` creates one native child with `fork_turns="all"` by default. A natural-language request can invoke the same Skill. The child receives the user's requested task in `message`; the Skill does not replace it with a mandatory review mission.
 
 The optional parameter helper outputs a plain native request:
 

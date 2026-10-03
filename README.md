@@ -9,7 +9,7 @@ Codex 已经能调用 `spawn_agent` 创建分身并传递上下文。这个插�
 在已安装插件、提供原生 `spawn_agent` 的 Codex 宿主中调用：
 
 ```text
-$open-task-twin
+$codex-twin-agents:open-task-twin
 ```
 
 也可以自然地说：
