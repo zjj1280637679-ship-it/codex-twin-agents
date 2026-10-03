@@ -53,6 +53,8 @@ codex-twin-agents/
 │   └── runtime-contract.md             # 孪生体与主线程通信约定
 ├── evals/
 │   └── cases.md                        # 最小验收场景
+├── tests/
+│   └── test_twin_fork.py               # Fork 请求生成器单元测试
 ├── AGENTS.md                           # 维护本仓库时给 Codex 的约束
 ├── LICENSE
 └── .gitignore
