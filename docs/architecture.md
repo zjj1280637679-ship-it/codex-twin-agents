@@ -96,3 +96,17 @@ A vector knowledge-base tool is a natural companion:
 - the main agent can retrieve only the relevant historical slice;
 - raw evidence remains the source of truth;
 - future Text-Vector Omni models can replace language serialization with native retrieval/memory representations without changing the high-level twin architecture.
+
+## Epistemology
+
+The twin architecture separates **context continuity** from **strategy/metric continuity**. The detailed model is documented in [epistemology.md](epistemology.md).
+
+The short form is:
+
+```text
+(G, C, S, M)
+→ open twin
+(G, C, S', M')
+```
+
+where the root goal and current conditions remain available, while local strategy and success metrics are allowed to reboot. A separate reality-calibration path may challenge C itself when shared-context cognitive inertia becomes the limiting factor.
