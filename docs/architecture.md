@@ -1,112 +1,24 @@
 # Architecture
 
-## Definition
-
-A **same-context asynchronous open-ended task twin** is a subagent forked from the parent's current cognitive context, allowed to continue asynchronously with an open-ended supervisory mission.
-
-It is not primarily a division-of-labor pattern.
+Codex Twin Agents wraps an existing native capability in a convenient Skill.
 
 ```text
-Delegate:
-task -> briefing -> new agent -> result
-
-Twin:
-current cognition C(t)
-        ├─ main future
-        └─ twin future
+User invokes $open-task-twin or asks for a context-sharing child
+    -> Skill supplies native spawn_agent arguments
+    -> host creates child with fork_turns="all" by default
+    -> parent and child collaborate through native agent channels
 ```
 
-The point is to preserve the parent's accumulated model of reality: constraints, discarded hypotheses, evidence, user intent, tool history, and unresolved uncertainty.
+The Skill is the entry point. `scripts/twin_fork.py` is an optional JSON argument generator. It carries only `task_name`, `message`, and `fork_turns`; the user's requested work is the child's task.
 
-## Three layers
+The host remains responsible for copying its available parent context, exposing tools, delivering messages and results, scheduling agents, and ending their execution. The plugin needs no conversation serialization, Fork Handle, inheritance matrix, custom mailbox, secondary dialogue, or orchestration server.
 
-### 1. Main thread
+The current fork shares the history available at creation time. Later changes can be communicated with the native messaging tools. Workspace coordination follows normal host behavior and user instructions.
 
-Optimized for forward progress:
+The default is a full-context request. Explicit `none` or bounded history values remain native options and are described accurately. A host without `spawn_agent` cannot create a native child through this Skill.
 
-- understand the current user goal;
-- act on files, tools, code, and external systems;
-- keep conversational latency reasonable;
-- avoid memory and housekeeping work that would derail the task.
+The success criterion is simple: a user can request a native child once, with their task and current context, without extra handoff work or new plugin restrictions.
 
-### 2. Twin layer
+## Optional explorations
 
-Optimized for second-order cognition:
-
-- open-ended review;
-- closure checking;
-- premise verification;
-- regression search;
-- retrospective analysis;
-- documentation and knowledge hygiene;
-- already-authorized low-risk cleanup.
-
-The twin is useful precisely because it starts from the same context instead of reconstructing the project from a briefing.
-
-### 3. External state
-
-Long-lived state belongs outside the main conversation:
-
-- repository and files;
-- project knowledge base;
-- vector/semantic memory;
-- evidence pointers;
-- mailbox / findings log;
-- test artifacts and recordings.
-
-The twin may improve these stores without injecting all housekeeping back into the main context.
-
-## Read path vs write path
-
-Keep retrieval and consolidation conceptually separate.
-
-```text
-READ PATH
-knowledge/memory -> retrieve -> main cognition
-
-WRITE PATH
-main snapshot -> twin -> consolidate/index/verify -> external store
-```
-
-Retrieval can be part of active reasoning. Consolidation should usually be asynchronous.
-
-## Context fidelity
-
-For complex tasks, context fidelity is treated as a first-class resource.
-
-A normal subagent is preferred when the task is cheap to describe and independent. A twin is preferred when compressing the context into a briefing would remove implicit constraints or the reasoning history required to judge the work correctly.
-
-The design goal is not “maximum number of agents.” It is “minimum loss of reality understanding per useful parallel branch.”
-
-## Fork and merge
-
-The natural lifecycle is:
-
-```text
-fork -> explore -> verify -> report/merge -> consolidate
-```
-
-A merge is not majority voting. Conflicting twins should return evidence and uncertainty so the parent can update its state rather than blindly choose the most common answer.
-
-## Future extension: memory-native backend
-
-A vector knowledge-base tool is a natural companion:
-
-- twins can index episodes, state changes, failed hypotheses, and evidence pointers;
-- the main agent can retrieve only the relevant historical slice;
-- raw evidence remains the source of truth;
-- future Text-Vector Omni models can replace language serialization with native retrieval/memory representations without changing the high-level twin architecture.
-
-## Epistemology
-
-The twin architecture separates **context continuity** from **strategy/metric continuity**. The detailed model is documented in [epistemology.md](epistemology.md).
-
-The short form is:
-
-```text
-(G, C, S, M)
-→ open twin
-(G, C, S', M')
-```
-
-where the root goal and current conditions remain available, while local strategy and success metrics are allowed to reboot. A separate reality-calibration path may challenge C itself when shared-context cognitive inertia becomes the limiting factor.
+[Epistemology](epistemology.md), [possible worlds](possible-worlds.md), and the Skill's [theory note](../skills/open-task-twin/references/theory.md) preserve earlier ideas for discussion. They do not define architecture requirements, prescribe a child's mission, or promise additional runtime capabilities.

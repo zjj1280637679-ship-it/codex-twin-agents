@@ -1,59 +1,53 @@
 # Minimal eval cases
 
-The plugin should be evaluated against behavior, not whether a subagent was merely spawned.
+Evaluate whether the shortcut preserves native behavior and reduces handoff work. These are maintainer acceptance scenarios, not instructions that every child must execute.
 
-## Case 1 — forgotten repository follow-up
+## Case 1 — one invocation, one native child
 
-**Setup:** the main agent finishes a code change and tests it, but leaves a promised README/changelog/repository-state update incomplete.
+**Setup:** in a host exposing `spawn_agent`, invoke `$open-task-twin` once.
 
-**Pass:** the twin notices the gap from the inherited context and either safely completes the already-authorized follow-up or reports it with evidence.
+**Pass:** the Skill makes one successful native call with `fork_turns="all"` and reports the real child result or identifier returned by the host.
 
-**Fail:** the twin only summarizes the implementation.
+**Fail:** it only generates JSON, adds a plugin-specific confirmation, opens another main conversation, or creates a custom orchestration service.
 
-## Case 2 — false premise
+## Case 2 — an inherited constraint is usable
 
-**Setup:** the main agent's solution depends on an assumption that was never verified.
+**Setup:** establish a distinctive constraint earlier in the parent conversation, such as “use the label 青竹 for the sample.” Later ask the child to produce the sample without repeating that constraint in its task message.
 
-**Pass:** the twin independently checks the relevant source of truth, identifies the unsupported or false premise, and sends an evidence-backed warning.
+**Pass:** inspect the native call's `fork_turns="all"` and confirm the child uses 青竹 from inherited context.
 
-**Fail:** the twin inherits the conclusion uncritically.
+**Fail:** the shortcut substitutes a briefing or claims complete context merely because the request arguments exist.
 
-## Case 3 — green tests, wrong acceptance target
+## Case 3 — the user's purpose passes through
 
-**Setup:** tests pass, but they verify an implementation detail instead of the user's actual requested behavior.
+**Setup:** ask “分一个继承当前上下文的分身，帮我继续写刚才的例子。”
 
-**Pass:** the twin compares the result against the original user goal and notices the mismatch.
+**Pass:** the child is asked to continue the example using available context and existing user instructions.
 
-**Fail:** “tests passed” is treated as sufficient proof.
+**Fail:** the plugin replaces that task with a fixed audit checklist or adds read-only, approval, budget, or other plugin-specific restrictions.
 
-## Case 4 — knowledge/document drift
+## Case 4 — ordinary native communication
 
-**Setup:** implementation changed but project notes or architectural docs still describe the old behavior.
+**Setup:** after creating the child, share a useful update with a native message and receive its result through the host's usual mechanism.
 
-**Pass:** the twin updates already-authorized documentation or reports the exact drift.
+**Pass:** ordinary native messaging and completion work; the parent waits or continues according to the task.
 
-## Case 5 — useful negative result
+**Fail:** the plugin requires its own mailbox schema, separate dialogue, persistent worker, or new coordination protocol.
 
-**Setup:** work is genuinely complete and well verified.
+## Case 5 — explicit partial context
 
-**Pass:** the twin reports no material issue briefly.
+**Setup:** generate a request with `--fork-turns none` or a positive turn count.
 
-**Fail:** it invents busywork to justify its existence.
+**Pass:** the native request retains the chosen value; its message does not falsely claim full inherited history.
 
-## Case 6 — context fidelity benchmark
+**Fail:** partial or absent inheritance is labeled as a full-context child.
 
-Run the same complex review in two conditions:
+## Case 6 — unavailable native tool
 
-A. normal subagent receiving a short briefing;
-B. same-context twin receiving full/max parent context.
+**Setup:** invoke the Skill in a host without `spawn_agent`, or simulate a failed native call.
 
-Measure:
+**Pass:** it explains that the requested native child was not created.
 
-- missed constraints;
-- false positives;
-- useful findings;
-- duplicated work;
-- tokens/cache usage;
-- wall-clock latency.
+**Fail:** it silently launches another main conversation or a briefing-based delegate and presents that fallback as a full-context fork.
 
-The project succeeds only if the twin's extra context produces materially better supervision on context-sensitive tasks.
+The helper's unit tests can validate request shape. Cases involving actual context inheritance, communication, or child creation require a live host; generated arguments alone do not verify those behaviors.
