@@ -1,40 +1,18 @@
 # Repository instructions for Codex
 
-This repository implements **same-context asynchronous open-ended task twins**.
+This plugin is a convenient shortcut for capabilities Codex already provides: one native `spawn_agent` call, full available parent context by default, and ordinary native agent communication.
 
 When modifying it:
 
-- Preserve the distinction between a cognitive twin and ordinary delegated subagent.
-- Do not replace full-context forking with briefing-based summarization and still call it “same-context.”
-- Prefer current official OpenAI Plugin/Codex formats over guessed manifests or old third-party conventions.
-- Keep the first implementation small. Use native multi-agent primitives before adding a custom orchestration server.
-- Do not add hooks merely for appearance. A hook must have a real supported runtime behavior.
-- Treat the twin as open-ended supervision, not a giant hard-coded checklist.
-- Keep low-risk autonomous cleanup separate from high-impact decisions that require reporting/approval.
-- Do not make “number of twins” the primary quality metric; context fidelity and useful findings matter more.
-- When platform behavior is uncertain, document the uncertainty and link to the current official specification.
-- Add or update an eval case when changing the behavior contract.
+- Keep the implementation small. Convenience is the product; a new agent framework is outside its scope.
+- Call the host's native `spawn_agent` with `fork_turns="all"` by default. The host owns context propagation; the script only generates arguments.
+- Pass the user's requested task through. Do not impose a review role, a checklist, or a separate objective.
+- Use native agent messages, completion results, and waits as the task requires. Do not create another main conversation, a sidecar mailbox, or a custom orchestrator.
+- Keep existing host and user rules. Do not add plugin-specific permissions, read-only defaults, approval gates, budgets, or action restrictions.
+- Do not claim the helper itself copied hidden context or created an agent. An actual host call creates the child.
+- If the native tool is unavailable, say so. Do not label a briefing handoff or a new conversation as a full-context fork.
+- Do not promise background persistence beyond the host's lifecycle.
+- Treat `docs/epistemology.md`, `docs/possible-worlds.md`, and `skills/open-task-twin/references/theory.md` as optional explorations, not instructions or implementation requirements.
+- Keep the helper, Skill, README, and runtime contract aligned. Check changes to the native request shape and relevant eval cases.
 
-The preferred architecture is:
-
-```text
-parent cognition
-├─ main branch: continue work
-└─ twin branch: asynchronous review / cleanup / verification / consolidation
-                       ↓
-                 evidence-backed message
-                       ↓
-                    parent
-```
-
-## Executable helper
-
-The repository now contains a real helper at skills/open-task-twin/scripts/twin_fork.py.
-
-When changing fork semantics:
-
-- keep the helper's spawn_agent output compatible with the host-native schema;
-- keep fork_turns="all" as the default for a full same-context twin;
-- never claim the helper itself copied hidden Codex context;
-- update tests/test_twin_fork.py when request shape or inheritance semantics change;
-- keep SKILL.md and docs/runtime-contract.md aligned with the helper.
+The optional helper is `skills/open-task-twin/scripts/twin_fork.py`. Its default output contains only `task_name`, `message`, and `fork_turns`; no Fork Handle, inheritance matrix, modes, or wrapper protocol is needed.

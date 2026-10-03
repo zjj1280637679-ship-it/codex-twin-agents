@@ -5,7 +5,7 @@ __pycache__/
 *.py[cod]
 node_modules/
 
-# 孪生运行的中间产物（设计约定：结果必须落盘，但不进版本库）
+# 本地运行产物
 .runs/
 *.log
 .DS_Store

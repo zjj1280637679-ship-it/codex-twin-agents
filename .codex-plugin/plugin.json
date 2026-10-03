@@ -1,7 +1,7 @@
 {
   "name": "codex-twin-agents",
-  "version": "0.2.0",
-  "description": "Native full-context Codex twin fork helper plus skills for asynchronous open-ended review, verification, and consolidation.",
+  "version": "0.3.0",
+  "description": "A convenient Skill for creating a native Codex child with full available context and ordinary agent communication.",
   "author": {
     "name": "zjj1280637679-ship-it"
   },
@@ -11,22 +11,20 @@
     "subagents",
     "multi-agent",
     "context-fork",
-    "review",
-    "verification"
+    "context-sharing",
+    "shortcut"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Codex Twin Agents",
-    "shortDescription": "Same-context cognitive forks",
-    "longDescription": "Create same-context Codex twins with native full-history forking, explicit Fork Handles, and skills that separate inherited goals/conditions from strategies/metrics that may be recomputed asynchronously.",
+    "shortDescription": "Native context-sharing shortcut",
+    "longDescription": "Create a native Codex child in one invocation with full available parent context by default, pass through the user's task, and collaborate using the host's ordinary agent channels.",
     "developerName": "zjj1280637679-ship-it",
     "category": "Developer Tools",
     "capabilities": [
-      "Native full-history cognitive forking",
-      "Fork Handle and inheritance matrix",
-      "Asynchronous open-ended review",
-      "Premise and acceptance verification",
-      "Knowledge consolidation"
+      "Native spawn_agent shortcut",
+      "Full available context by default",
+      "Native agent communication"
     ]
   }
 }
