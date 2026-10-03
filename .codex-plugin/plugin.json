@@ -1,7 +1,7 @@
 {
   "name": "codex-twin-agents",
-  "version": "0.1.0",
-  "description": "Fork same-context Codex twins for asynchronous open-ended review, cleanup, verification, and follow-up.",
+  "version": "0.2.0",
+  "description": "Native full-context Codex twin fork helper plus skills for asynchronous open-ended review, verification, and consolidation.",
   "author": {
     "name": "zjj1280637679-ship-it"
   },
@@ -17,16 +17,16 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Codex Twin Agents",
-    "shortDescription": "Full-context async twins",
-    "longDescription": "Create same-context Codex twins that continue from the parent's full or maximum available context and asynchronously inspect unfinished, unverified, inconsistent, or improvable work. Twins can complete already-authorized low-risk cleanup and report higher-impact findings back to the parent with evidence.",
+    "shortDescription": "Same-context cognitive forks",
+    "longDescription": "Create same-context Codex twins with native full-history forking, explicit Fork Handles, and skills that separate inherited goals/conditions from strategies/metrics that may be recomputed asynchronously.",
     "developerName": "zjj1280637679-ship-it",
     "category": "Developer Tools",
     "capabilities": [
-      "Same-context cognitive forking",
+      "Native full-history cognitive forking",
+      "Fork Handle and inheritance matrix",
       "Asynchronous open-ended review",
-      "Missed-step and cleanup recovery",
       "Premise and acceptance verification",
-      "Knowledge-base and project hygiene"
+      "Knowledge consolidation"
     ]
   }
 }
