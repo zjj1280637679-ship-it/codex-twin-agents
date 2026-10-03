@@ -43,7 +43,9 @@ codex-twin-agents/
 │   └── plugin.json                     # Codex 兼容清单
 ├── skills/
 │   └── open-task-twin/
-│       └── SKILL.md                    # 核心孪生工作流
+│       ├── SKILL.md                    # 核心孪生工作流与理论立意
+│       ├── scripts/twin_fork.py        # Fork Handle + spawn_agent 请求生成器
+│       └── references/theory.md        # Skill 内部理论摘要
 ├── docs/
 │   ├── architecture.md                 # 架构与边界
 │   ├── epistemology.md                  # 目标-条件-策略-指标与认知自由度
@@ -55,6 +57,15 @@ codex-twin-agents/
 ├── LICENSE
 └── .gitignore
 ```
+
+## v0.2：插件现在真正包含什么
+
+插件现在明确分成两个核心部件：
+
+1. **程序层**：skills/open-task-twin/scripts/twin_fork.py 负责构造认知分身句柄、继承矩阵和原生 spawn_agent 参数。真正的上下文复制仍由 Codex 自己执行，关键参数是 fork_turns: "all"。
+2. **技能层**：skills/open-task-twin/SKILL.md 负责告诉 Codex 什么时候应该分身、怎样区分普通委派与同文孪生、怎样异步继续、怎样汇报，以及“保留 G/C、重推 S/M”的理论立意。
+
+这个边界是刻意的：**插件不重新序列化主对话；插件只定义如何 fork，Codex runtime 负责复制它真正拥有的上下文。**
 
 ## 最小工作流
 
@@ -136,7 +147,7 @@ M = 指标
 
 ## 状态
 
-**v0.1.0 — architecture-first, skill-first prototype**
+**v0.2.0 — first executable fork helper + skill runtime**
 
 第一阶段只验证一个核心命题：
 
