@@ -17,7 +17,7 @@ For an open twin, preserve G = root goal and C = shared conditions/evidence, whi
 
 The twin remembers the same past but is not obliged to continue the same local plan.
 
-Read references/theory.md for the compact theory and ../../../docs/epistemology.md for the full project treatment.
+Read references/theory.md for the compact theory and ../../docs/epistemology.md for the full project treatment.
 
 ## Native runtime contract
 
