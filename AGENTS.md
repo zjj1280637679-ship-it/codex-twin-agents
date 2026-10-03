@@ -26,3 +26,15 @@ parent cognition
                        ↓
                     parent
 ```
+
+## Executable helper
+
+The repository now contains a real helper at skills/open-task-twin/scripts/twin_fork.py.
+
+When changing fork semantics:
+
+- keep the helper's spawn_agent output compatible with the host-native schema;
+- keep fork_turns="all" as the default for a full same-context twin;
+- never claim the helper itself copied hidden Codex context;
+- update tests/test_twin_fork.py when request shape or inheritance semantics change;
+- keep SKILL.md and docs/runtime-contract.md aligned with the helper.
