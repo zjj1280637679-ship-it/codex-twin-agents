@@ -1,5 +1,29 @@
 # Theory for the Open Task Twin skill
 
+## Paradigm diagnosis
+
+The project starts from a diagnosis, not an invention.
+
+A common agent pattern quietly bundles several independent choices together:
+
+    child role
+    -> less context
+    -> narrower task
+    -> briefing-based handoff
+    -> cognitively subordinate position
+
+That bundle is often useful, but it is not the nature of AI context. The mistake is turning a frequent implementation pattern into an ontological rule.
+
+Codex already has native mechanisms that can support a child with full parent history. The plugin therefore does not create a new intelligence capability. It exposes a state that the underlying system already permits and encourages the agent to consider using it.
+
+The project is better described as **deconstraint** than enhancement:
+
+> **Recover the agent states that become invisible when governance hierarchy is mistaken for information hierarchy.**
+
+Or, more compactly:
+
+> **Agent Liberation, not Agent Enhancement.**
+
 This skill rests on a simple separation:
 
 ```text
@@ -131,3 +155,32 @@ Digital context can be copied, cropped, expanded, fused, forked, replayed, compa
 The wider thesis is therefore:
 
 > **Authority is not information. "Sub" describes governance, not cognition. Do not enhance intelligence first; remove the unnecessary constraints that stop it from using the context it can already have.**
+
+## The bad default is coupling, not delegation
+
+Minimal-context delegation is not wrong. It is often the best choice.
+
+The undesirable inertia appears only when these choices become coupled by default:
+
+    child => less information
+    parallelism => summarization
+    division of labor => context loss
+    context inheritance => strategy inheritance
+
+The theory does not replace those defaults with a new mandatory opposite. It restores choice.
+
+A healthy runtime should be able to choose independently:
+
+    how much authority this branch has
+    how much information this branch has
+    what task shape it receives
+    whether it inherits strategy
+    whether it inherits success metrics
+
+The important move is not 'always give children full context.'
+
+It is:
+
+> **Stop assuming that being a child tells you how much context it should have.**
+
+That is why the executable plugin remains tiny while the theory is broader: the code unlocks one neglected point in the design space; the theory explains the design space itself.
