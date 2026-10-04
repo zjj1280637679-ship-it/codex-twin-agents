@@ -7,9 +7,11 @@ description: 一次调用 Codex 原生分身工具，默认共享当前完整可
 
 ## Principle
 
-> **When using subagents, also consider creating one with the same complete context as you for difficult division of labor or open-ended assistance.**
+> **在使用子代理时，额外考虑制造一个拥有与你一样完整上下文的子代理，用于困难分工或开放性辅助。**
 
-A subagent is a governance relationship, not an information hierarchy. Do not assume a child must know less than the parent.
+这是一个额外候选，不是新的强制默认。最小上下文委派仍然适合简单、边界清晰的任务；这里只是不要因为一个代理在权限上是“子”，就自动推断它在信息上也必须是“子集”。
+
+**权限不等于信息。子代理不必比主代理知道得少。**
 
 这是原生分身能力的便捷入口。上下文复制、代理运行和通信由宿主完成。
 
