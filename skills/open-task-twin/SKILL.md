@@ -5,6 +5,12 @@ description: 一次调用 Codex 原生分身工具，默认共享当前完整可
 
 # Open Task Twin
 
+## Principle
+
+> **When using subagents, also consider creating one with the same complete context as you for difficult division of labor or open-ended assistance.**
+
+A subagent is a governance relationship, not an information hierarchy. Do not assume a child must know less than the parent.
+
 这是原生分身能力的便捷入口。上下文复制、代理运行和通信由宿主完成。
 
 调用当前宿主的原生 `spawn_agent`，例如 `collaboration.spawn_agent`：
