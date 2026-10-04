@@ -69,3 +69,65 @@ A useful mental model is:
 > allowed to become uncommitted.
 
 See `docs/epistemology.md` for the full model.
+
+## Design thesis: "sub" is governance, not cognition
+
+This project does not try to invent a new kind of intelligence. It removes a default assumption that narrows how existing intelligence is used:
+
+> **A subagent is a governance position, not a cognitive form.**
+
+The word "sub" describes who created, coordinates, redirects, or stops an agent. It does not imply that the child must know less, receive a shorter briefing, inherit weaker context, or be cognitively subordinate.
+
+Keep three topologies separate:
+
+    Authority topology  -> who can govern whom
+    Information topology -> who has which context, memory, evidence, or project history
+    Task topology       -> who works on which branch of work
+
+Therefore all of these are valid:
+
+    authority(child) < authority(parent)
+    information(child) = information(parent)
+
+or even:
+
+    authority(child) < authority(parent)
+    information(child) > information(parent)
+
+Parent/child is a runtime relationship. It is not an epistemic hierarchy.
+
+## Context is a design space
+
+Traditional multi-agent systems often assume:
+
+    C_child < C_parent
+
+because the child receives a compressed briefing. But context relations can be richer:
+
+    MINIMAL     child receives only task-essential context
+    PARTIAL     child receives selected or recent parent history
+    EQUIVALENT  child receives the same full context as the parent
+    SUPERSET    child receives parent context plus extra knowledge
+    FUSED       child combines multiple project/context sources
+
+Codex Twin Agents currently focuses on the EQUIVALENT case because Codex already exposes native full-history forking. The wider theory is that context should be composed according to the cognitive job, not minimized merely because an execution branch is called a child.
+
+A practical Skill principle is:
+
+> **When using subagents, also consider creating one with the same complete context as you for difficult division of labor or open-ended assistance.**
+
+Even shorter:
+
+> **A subagent does not have to know less than you.**
+
+## From multi-agent to context topology
+
+The deeper object is not parent_agent / child_agent. It is:
+
+    context_state + execution_branch
+
+Digital context can be copied, cropped, expanded, fused, forked, replayed, compared, and merged. Many apparently new agent abilities emerge when these operations stop being artificially coupled to one human organizational metaphor.
+
+The wider thesis is therefore:
+
+> **Authority is not information. "Sub" describes governance, not cognition. Do not enhance intelligence first; remove the unnecessary constraints that stop it from using the context it can already have.**
