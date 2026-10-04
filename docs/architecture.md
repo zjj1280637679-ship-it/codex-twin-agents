@@ -49,6 +49,21 @@ A practical design slogan is:
 
 The code is only a convenient button for a native full-context fork. The conceptual value is reminding the agent that "sub" does not mean "less informed."
 
+## Deconstraint, not a replacement framework
+
+The project should not replace one rigid convention with another.
+
+Minimal-context delegates remain useful. Full-context twins are not mandatory. The architectural change is simply that context size is no longer inferred from the word "child."
+
+In other words:
+
+    old habit: child -> less context
+    restored design space: child -> context chosen for the task
+
+This is why the executable implementation should stay thin. If a large custom runtime were required merely to create a full-context child, the project would be inventing new infrastructure. Here, Codex already owns the capability; the plugin exposes an underused configuration and the Skill reminds the agent to consider it.
+
+> **The smallness of the code is part of the thesis: the potential was already there.**
+
 ## Optional explorations
 
 [Epistemology](epistemology.md), [possible worlds](possible-worlds.md), and the Skill's [theory note](../skills/open-task-twin/references/theory.md) preserve earlier ideas for discussion. They do not define architecture requirements, prescribe a child's mission, or promise additional runtime capabilities.
