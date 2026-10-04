@@ -19,6 +19,36 @@ The default is a full-context request. Explicit `none` or bounded history values
 
 The success criterion is simple: a user can request a native child once, with their task and current context, without extra handoff work or new plugin restrictions.
 
+## Design philosophy
+
+The implementation stays deliberately small because the plugin is not trying to build a second agent framework.
+
+Its deeper design position is:
+
+> **A subagent is a governance relationship, not an information hierarchy.**
+
+The host may call an execution branch a child, but that does not imply the child must have less context than the parent.
+
+Keep these dimensions separate:
+
+    authority relation
+    information relation
+    task relation
+
+For this plugin, the executable path focuses on one case:
+
+    authority: child
+    information: equivalent full parent context
+    task: chosen by the current user/agent situation
+
+The broader theory allows information relations such as subset, equal, superset, and fused context. Those belong to the theory documents rather than to extra runtime machinery here.
+
+A practical design slogan is:
+
+> **Do not default to making a subagent forget.**
+
+The code is only a convenient button for a native full-context fork. The conceptual value is reminding the agent that "sub" does not mean "less informed."
+
 ## Optional explorations
 
 [Epistemology](epistemology.md), [possible worlds](possible-worlds.md), and the Skill's [theory note](../skills/open-task-twin/references/theory.md) preserve earlier ideas for discussion. They do not define architecture requirements, prescribe a child's mission, or promise additional runtime capabilities.
