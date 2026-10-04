@@ -1,154 +1,37 @@
 # Runtime contract
 
-The runtime contract keeps the twin useful without turning it into an uncontrolled second main agent.
+The plugin is a shortcut to the host's native `spawn_agent`. The user supplies the purpose; the host supplies agents, context propagation, communication, tools, and lifecycle.
 
-## What the plugin program can and cannot do
+## Invocation
 
-The plugin includes:
+`$codex-twin-agents:open-task-twin` creates one native child with `fork_turns="all"` by default. A natural-language request can invoke the same Skill. The child receives the user's requested task in `message`; the Skill does not replace it with a mandatory review mission.
 
-    skills/open-task-twin/scripts/twin_fork.py
+The optional parameter helper outputs a plain native request:
 
-This program builds and validates a Fork Handle plus a native spawn_agent request.
+```json
+{
+  "task_name": "context_twin",
+  "message": "<the requested task>",
+  "fork_turns": "all"
+}
+```
 
-It intentionally does not attempt to serialize or copy the live Codex conversation itself.
+It does not call `spawn_agent`, copy context, or produce an agent handle. The parent passes the generated arguments to its native tool. Directly constructing the same arguments is also valid.
 
-Why:
+`--task-name`, `--message`, and `--fork-turns all|none|N` override the defaults. `none` requests no inherited turns and a number requests bounded history; neither should be described as full-context inheritance. Any additional options exposed by the host remain ordinary native capabilities, without a plugin-defined protocol.
 
-- the live parent context belongs to the Codex host;
-- a plugin script does not have a privileged hidden-context handle;
-- re-sending chat history from a script would turn a native fork into a lossy handoff;
-- current Codex already provides the correct primitive: spawn_agent(..., fork_turns="all").
+## Context and communication
 
-Therefore the architecture is:
+The host propagates the context it makes available for the selected `fork_turns` value. This is the context at the fork; subsequent parent turns are not promised to synchronize automatically. New information can be shared through native messages as needed.
 
-    plugin helper
-      -> define fork semantics
-      -> emit spawn request
-      -> Codex native spawn_agent
-      -> host copies parent history
+The parent uses the host's ordinary agent messaging, completion results, and wait mechanisms. Whether to continue concurrently or wait depends on the current task. There is no custom mailbox schema, result format, or mandatory synchronization checkpoint.
 
-The program is the fork-policy adapter; Codex is the context-copy engine.
+User instructions and native host rules continue to apply normally. This plugin adds no read-only default, permission layer, approval gate, fixed budget, or restrictions on the child's authorized work.
 
-## Fork Handle
+## Availability and lifecycle
 
-A Fork Handle distinguishes identity and continuity without rewriting the whole task.
+Only a successful native call establishes that a child exists. If `spawn_agent` is unavailable or fails, report that outcome using the ordinary host behavior. A newly created main conversation or a short briefing handoff is not a full-context fork.
 
-Example:
+Agent concurrency and lifetime belong to the host. The plugin does not provide a persistent worker or guarantee that a child continues after the parent turn or session ends.
 
-    fork_id=twin-...
-    self_role=TWIN
-    parent_role=MAIN
-    mode=OPEN
-    execution=ASYNC
-    return_channel=PARENT_MAILBOX
-    divergence_intent=first_principles_complement
-
-The handle also carries an inheritance matrix.
-
-For OPEN mode:
-
-    inherit:
-      root_goal
-      world_conditions
-      evidence_history
-      user_constraints
-
-    release:
-      local_strategy
-      local_metrics
-      completion_pressure
-
-This means:
-
-> remember the same past; do not owe loyalty to the same local future.
-
-## Parent responsibilities
-
-The parent should:
-
-- fork only at meaningful checkpoints;
-- use fork_turns="all" when full cognitive continuity is the point;
-- continue its own work instead of waiting by default;
-- avoid duplicating the twin's assigned cognitive role;
-- read twin findings at natural synchronization points;
-- make final decisions when findings would materially change the user's requested direction.
-
-## Twin responsibilities
-
-The twin should:
-
-- treat inherited history as its own past, not as a briefing;
-- avoid wasting the first turn summarizing what both branches already know;
-- independently inspect the current reality;
-- distinguish root goal, conditions, strategy, and metrics;
-- preserve evidence even when releasing the parent's local plan;
-- safely complete already-authorized low-risk cleanup;
-- report consequential findings rather than silently rewriting the project's direction;
-- remain quiet when there is nothing material to add.
-
-## Mailbox message
-
-Recommended schema:
-
-    {
-      "severity": "info | warning | critical",
-      "kind": "cleanup | verification | premise | regression | knowledge | follow-up",
-      "finding": "Concise description",
-      "evidence": [
-        "file/test/log/commit/doc reference"
-      ],
-      "action_taken": "Safe action already completed, or null",
-      "recommended_next": "Parent action, or null"
-    }
-
-This is a communication shape, not a requirement to serialize all twin cognition into JSON.
-
-## Action boundary
-
-### Twin may act directly
-
-When the action is already authorized, low-risk, and reversible, examples include:
-
-- update local documentation to match an implementation already completed;
-- run additional tests;
-- clean an obviously generated temporary artifact;
-- update a project knowledge note;
-- prepare a missing changelog entry;
-- inspect repository state and repair a harmless local omission.
-
-### Twin should report first
-
-Examples include:
-
-- changing core architecture;
-- reverting substantial parent work;
-- publishing or deploying where authorization is unclear;
-- destructive file or data operations;
-- contacting external parties;
-- changing security or permission boundaries;
-- any action based on a newly discovered premise conflict that changes the task's intended outcome.
-
-## Concurrency rule
-
-Twins that only read can run freely within host limits.
-
-Twins that write to the same mutable workspace must coordinate. Prefer:
-
-1. one writing twin at a time, or
-2. isolated branches/worktrees followed by explicit merge.
-
-Do not treat "more twins" as inherently better.
-
-## Failure behavior
-
-If native spawn_agent is unavailable:
-
-- do not claim a twin exists;
-- do not silently replace full-context inheritance with a short briefing;
-- the parent may fall back to a normal delegate, but it should label that fallback honestly.
-
-If only bounded history propagation is available:
-
-- request the maximum useful history;
-- mark the branch as a partial-context fork;
-- do not treat it as equivalent to a full-history twin in evaluation.
+Theory documents in this repository are optional explorations. They do not add runtime obligations to this contract.

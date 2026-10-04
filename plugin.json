@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "codex-twin-agents",
-  "version": "0.2.0",
-  "description": "Native full-context Codex twin fork helper plus skills for asynchronous open-ended review, verification, and consolidation.",
+  "version": "0.3.0",
+  "description": "A convenient Skill for creating a native Codex child with full available context and ordinary agent communication.",
   "author": {
     "name": "zjj1280637679-ship-it"
   },
@@ -13,7 +13,7 @@
     "subagents",
     "multi-agent",
     "context-fork",
-    "cognitive-twin",
-    "verification"
+    "context-sharing",
+    "shortcut"
   ]
 }

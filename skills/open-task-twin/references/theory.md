@@ -1,5 +1,29 @@
 # Theory for the Open Task Twin skill
 
+## Paradigm diagnosis
+
+The project starts from a diagnosis, not an invention.
+
+A common agent pattern quietly bundles several independent choices together:
+
+    child role
+    -> less context
+    -> narrower task
+    -> briefing-based handoff
+    -> cognitively subordinate position
+
+That bundle is often useful, but it is not the nature of AI context. The mistake is turning a frequent implementation pattern into an ontological rule.
+
+Codex already has native mechanisms that can support a child with full parent history. The plugin therefore does not create a new intelligence capability. It exposes a state that the underlying system already permits and encourages the agent to consider using it.
+
+The project is better described as **deconstraint** than enhancement:
+
+> **Recover the agent states that become invisible when governance hierarchy is mistaken for information hierarchy.**
+
+Or, more compactly:
+
+> **Agent Liberation, not Agent Enhancement.**
+
 This skill rests on a simple separation:
 
 ```text
@@ -69,3 +93,94 @@ A useful mental model is:
 > allowed to become uncommitted.
 
 See `docs/epistemology.md` for the full model.
+
+## Design thesis: "sub" is governance, not cognition
+
+This project does not try to invent a new kind of intelligence. It removes a default assumption that narrows how existing intelligence is used:
+
+> **A subagent is a governance position, not a cognitive form.**
+
+The word "sub" describes who created, coordinates, redirects, or stops an agent. It does not imply that the child must know less, receive a shorter briefing, inherit weaker context, or be cognitively subordinate.
+
+Keep three topologies separate:
+
+    Authority topology  -> who can govern whom
+    Information topology -> who has which context, memory, evidence, or project history
+    Task topology       -> who works on which branch of work
+
+Therefore all of these are valid:
+
+    authority(child) < authority(parent)
+    information(child) = information(parent)
+
+or even:
+
+    authority(child) < authority(parent)
+    information(child) > information(parent)
+
+Parent/child is a runtime relationship. It is not an epistemic hierarchy.
+
+## Context is a design space
+
+Traditional multi-agent systems often assume:
+
+    C_child < C_parent
+
+because the child receives a compressed briefing. But context relations can be richer:
+
+    MINIMAL     child receives only task-essential context
+    PARTIAL     child receives selected or recent parent history
+    EQUIVALENT  child receives the same full context as the parent
+    SUPERSET    child receives parent context plus extra knowledge
+    FUSED       child combines multiple project/context sources
+
+Codex Twin Agents currently focuses on the EQUIVALENT case because Codex already exposes native full-history forking. The wider theory is that context should be composed according to the cognitive job, not minimized merely because an execution branch is called a child.
+
+A practical Skill principle is:
+
+> **When using subagents, also consider creating one with the same complete context as you for difficult division of labor or open-ended assistance.**
+
+Even shorter:
+
+> **A subagent does not have to know less than you.**
+
+## From multi-agent to context topology
+
+The deeper object is not parent_agent / child_agent. It is:
+
+    context_state + execution_branch
+
+Digital context can be copied, cropped, expanded, fused, forked, replayed, compared, and merged. Many apparently new agent abilities emerge when these operations stop being artificially coupled to one human organizational metaphor.
+
+The wider thesis is therefore:
+
+> **Authority is not information. "Sub" describes governance, not cognition. Do not enhance intelligence first; remove the unnecessary constraints that stop it from using the context it can already have.**
+
+## The bad default is coupling, not delegation
+
+Minimal-context delegation is not wrong. It is often the best choice.
+
+The undesirable inertia appears only when these choices become coupled by default:
+
+    child => less information
+    parallelism => summarization
+    division of labor => context loss
+    context inheritance => strategy inheritance
+
+The theory does not replace those defaults with a new mandatory opposite. It restores choice.
+
+A healthy runtime should be able to choose independently:
+
+    how much authority this branch has
+    how much information this branch has
+    what task shape it receives
+    whether it inherits strategy
+    whether it inherits success metrics
+
+The important move is not 'always give children full context.'
+
+It is:
+
+> **Stop assuming that being a child tells you how much context it should have.**
+
+That is why the executable plugin remains tiny while the theory is broader: the code unlocks one neglected point in the design space; the theory explains the design space itself.
